@@ -2,7 +2,7 @@
 
 ![Weather icons](https://polpo.org/espweather/montage.png)
 
-Cute weather station for the ESP8266 WiFi microcontroller, written with Arduino/C++. [Powered by Dark Sky](https://darksky.net/poweredby).
+Cute weather station for the [ESP8266](https://en.wikipedia.org/wiki/ESP8266) WiFi microcontroller, written with [Arduino](https://github.com/esp8266/Arduino)/C++. [Powered by Dark Sky](https://darksky.net/poweredby).
 
 ## requirements ##
 
