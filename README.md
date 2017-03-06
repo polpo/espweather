@@ -24,3 +24,9 @@ Edit `constants.h` and put in your WiFi info, [Dark Sky API key](https://darksky
 ## weather icons ##
 
 The weather icons are 24x16 pixels. In the `png2h/images` directory you will find them, and they can be converted to the format expected by the CFA632 with the `png2h/png2h.py` script.
+
+## screenshots ##
+
+Instead of screenshots, how about a GIF?
+
+![Animated GIF of espweather](https://polpo.org/espweather/espweather.gif)
