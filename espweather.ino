@@ -1,5 +1,6 @@
 #include <ESP8266WiFi.h>
-//#include <ArduinoJson.h>
+#include <ArduinoOTA.h>
+
 #include <JsonStreamingParser.h>
 #include "WeatherListener.h"
 
@@ -34,6 +35,7 @@ void scroll_string(String &daily_str, String &weekly_str) {
   int len = str->length();
   int pos = 0;
   while (true) {
+    ArduinoOTA.handle();
 
     if (pos == 0) {
       // Beginning of string
@@ -113,11 +115,34 @@ void setup() {
   IPAddress ip = WiFi.localIP();
   Serial.printf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
   delay(2000);
+
+  ArduinoOTA.setPassword("espweather");
+
+  ArduinoOTA.onStart([]() {
+    Serial.println("\014OTA Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.print("\014OTA End");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("\014Progress: %u%%", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("\014OTA Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("\014Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("\014Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("\014Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("\014Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("\014End Failed");
+  });
+  ArduinoOTA.begin();  
 }
 
 void loop() {
   JsonStreamingParser parser;
   WeatherListener listener;
+
+  ArduinoOTA.handle();
   
   Serial.printf("\014Fetching url\r\n");
   WiFiClientSecure client;
