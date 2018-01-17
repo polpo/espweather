@@ -146,19 +146,27 @@ void loop() {
   
   Serial.printf("\014Fetching url\r\n");
   WiFiClientSecure client;
-  client.connect("api.darksky.net", 443);
+  if (client.connect("api.darksky.net", 443)) {
+    Serial.printf("\014Connected\r\n");
+  } else {
+    Serial.printf("\014Error fetching");
+    delay(9999999);
+  }
   client.printf("GET /forecast/%s/%s?exclude=currently,hourly,minutely,alerts,flags HTTP/1.1\r\n", api_key, latlong);
   client.printf("Host: api.darksky.net\r\n");
   client.printf("Connection: close\r\n");
   client.printf("\r\n");
   delay(10);
+  Serial.printf("\014Reading");
+
   while (client.connected()) {
     String line = client.readStringUntil('\n');
+    Serial.printf(".");
     if (line == "\r") {
       break;
     }
   }
-  Serial.printf("Parsing response\r\n");
+  Serial.printf("\014Parsing response\r\n");
 
   parser.setListener(&listener);
   while (client.connected()) {
