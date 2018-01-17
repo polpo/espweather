@@ -16,15 +16,19 @@ void WeatherListener::key(String key) {
   } else {
     this->in_temperatureMin = false;
   }
+  if (key == "data") {
+    this->in_data = true;
+  }
   if (key == "summary") {
     this->in_summary = true;
   } else {
     this->in_summary = false;
   }
+
 }
 
 void WeatherListener::value(String value) {
-  if (this->in_icon && !this->got_icon) {
+  if (this->in_data && this->in_icon && !this->got_icon) {
     this->icon = value;
     this->got_icon = true;
   }
@@ -36,9 +40,21 @@ void WeatherListener::value(String value) {
     this->temperatureMin = value.toInt();
     this->got_temperatureMin = true;
   }
-  if (this->in_summary && !this->got_summary) {
-    this->summary = value;
-    this->got_summary = true;
+  if (this->in_summary) {
+    if (this->in_data && !this->got_summary_daily) {
+      this->summary_daily = value;
+      this->got_summary_daily = true;
+    }
+    if (!this->in_data && !this->got_summary_weekly) {
+       this->summary_weekly = value;
+       this->got_summary_weekly = true;
+    }
+  }
+}
+
+void WeatherListener::endArray() {
+  if (this->in_data) {
+    this->in_data = false;
   }
 }
 

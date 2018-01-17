@@ -12,8 +12,9 @@ class WeatherListener: public JsonListener {
     bool in_temperatureMax;
     bool got_temperatureMax;
     bool in_summary;
-    bool got_summary;
-
+    bool got_summary_daily;
+    bool got_summary_weekly;
+    
   public:
     WeatherListener()
       : in_data(false),
@@ -24,13 +25,15 @@ class WeatherListener: public JsonListener {
         in_temperatureMax(false),
         got_temperatureMax(false),
         in_summary(false),
-        got_summary(false),
+        got_summary_daily(false),
+        got_summary_weekly(false),
         JsonListener() { }
 
     String icon;
     uint8_t temperatureMax;
     uint8_t temperatureMin;
-    String summary;
+    String summary_daily;
+    String summary_weekly;
 
     void whitespace(char c) {};
   
@@ -40,7 +43,7 @@ class WeatherListener: public JsonListener {
 
     virtual void value(String value);
 
-    void endArray() {};
+    virtual void endArray();
 
     void endObject() {};
 

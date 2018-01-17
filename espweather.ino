@@ -27,31 +27,51 @@ void print_icon_pt2() {
   Serial.printf("\204\205\206\207            ");
 }
 
-void scroll_string(String str) {
+void scroll_string(String &daily_str, String &weekly_str) {
+  bool is_daily = true;
+  String *str = &daily_str;
   unsigned long start_time = millis();
-  int len = str.length();
+  int len = str->length();
   int pos = 0;
   while (true) {
-    // Position cursor to start of scroll area
-    Serial.printf("\021\004\001");
-    Serial.print(str.substring(pos, pos+12));
+
     if (pos == 0) {
       // Beginning of string
-      ++pos;
-      delay(2000);
-    } else if (pos == len - 12) {
-      // End of string
-      // Break after scrolling for 1 hour
-      // TODO handle millis() overflow (70 days)
-      if (millis() - start_time > 3600000) {
-        break;
+      // Position cursor to start of scroll area
+      Serial.printf("\021\004\001");
+      if (is_daily) {
+        Serial.print("Today:      ");
+      } else {
+        Serial.print("Coming up:  ");
       }
-      pos = 0;
+      delay(1500);
+    }
+
+    // Position cursor to start of scroll area
+    Serial.printf("\021\004\001");
+    Serial.print(str->substring(pos, pos+12));
+    ++pos;
+    delay(200);
+
+    if (pos == 1) {
       delay(2000);
-    } else {
-      // In the middle
-      ++pos;
-      delay(200);
+    } else if (pos >= len - 12) {
+      // End of string
+      pos = 0;
+      if (is_daily) {
+        str = &weekly_str;
+      } else {
+        str = &daily_str;
+      }
+      len = str->length();
+      is_daily = !is_daily;
+
+      delay(2000);
+    }
+    // Break after scrolling for 1 hour
+    // TODO handle millis() overflow (70 days)
+    if (millis() - start_time > 3600000) {
+      break;
     }
   }
 }
@@ -140,6 +160,11 @@ void loop() {
 
   // Replace unicode degree symbol with blank. TODO handle multibyte degree symbol
   // ("\036\001\200") while scrolling
-  listener.summary.replace("°", "");
-  scroll_string(listener.summary);
+  listener.summary_daily.replace("°", "");
+  listener.summary_weekly.replace("°", "");
+  // Replace en dash with hyphen
+  listener.summary_daily.replace("–", "-");
+  listener.summary_weekly.replace("–", "-");
+
+  scroll_string(listener.summary_daily, listener.summary_weekly);
 }
