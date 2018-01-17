@@ -6,8 +6,8 @@
 #include "icons.h"
 #include "constants.h"
 
-// TODO spin while connecting to WiFi
-// const char spinner[] = {'/', '-', 0b11111011, 0b11111110};
+// spin while connecting to WiFi
+const char spinner[] = {'/', '-', 0b11111011, 0b11111110};
 
 void load_icon(const uint8_t icon[]) {
   for (uint8_t c = 0; c < 8; c++) {
@@ -77,8 +77,12 @@ void scroll_string(String &daily_str, String &weekly_str) {
 }
 
 void setup() {
-  // TODO spin while connecting to WiFi
-  // uint8_t spinner_index = 0;
+  WiFi.mode(WIFI_STA);
+  // FIXME -- WiFi.begin is buggy. Work around: https://github.com/esp8266/Arduino/issues/2186
+  if (WiFi.status() != WL_CONNECTED) {  // FIX FOR USING 2.3.0 CORE (only .begin if not connected)
+      WiFi.begin(ssid, password);       // connect to the network
+  }    
+  uint8_t spinner_index = 0;
 
   // Initialize Crystalfontz display
   Serial.begin(19200, SERIAL_8N1);
@@ -98,10 +102,13 @@ void setup() {
   delay(1000);
 
   // Associate with wifi
-  Serial.printf("Connecting to\r\n%s... ", ssid);
-  WiFi.mode(WIFI_STA);
-  // FIXME -- WiFi.begin is buggy. Work around: https://github.com/esp8266/Arduino/issues/2186
-  WiFi.begin(ssid, password);
+  Serial.printf("Connecting to\r\n%s...  ", ssid);
+  
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.printf("\010%c", spinner[spinner_index++ % 4]);
+    delay(250);
+  }
+  
   Serial.printf("\014Connected! IP:\r\n");
   IPAddress ip = WiFi.localIP();
   Serial.printf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3]);
