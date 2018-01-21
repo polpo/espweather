@@ -30,8 +30,8 @@ class WeatherListener: public JsonListener {
         JsonListener() { }
 
     String icon;
-    uint8_t temperatureMax;
-    uint8_t temperatureMin;
+    int8_t temperatureMax;
+    int8_t temperatureMin;
     String summary_daily;
     String summary_weekly;
 
